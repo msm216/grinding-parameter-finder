@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import mglearn
 
 from time import time
 
@@ -26,6 +27,7 @@ kfold = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
 # Linear Regression
+print("Star training Linear Regression...")
 lreg = linear_model.LinearRegression()
 # specify the parameters to be searched as a dictionary
 param_grid_lreg = {
@@ -45,9 +47,12 @@ pred_lreg = lreg.predict  # <--- for the function picking!
 mse_lreg = mean_squared_error(y_test, pred_lreg(X_test))
 mae_lreg = mean_absolute_error(y_test, pred_lreg(X_test))
 r2_lreg = r2_score(y_test, pred_lreg(X_test))
+print("MSE: ", mse_lreg)
+print("MAE: ", mae_lreg)
 
 
 # Decision Tree
+print("Star training Decision Tree...")
 dtree = tree.DecisionTreeRegressor()
 # specify the parameters to be searched as a dictionary
 depth_list = np.arange(1, 11, 1).tolist()
@@ -64,9 +69,39 @@ pred_dtree = dtree.predict  # <--- for the function picking!
 mse_dtree = mean_squared_error(y_test, pred_dtree(X_test))
 mae_dtree = mean_absolute_error(y_test, pred_dtree(X_test))
 r2_dtree = r2_score(y_test, pred_dtree(X_test))
+print("MSE: ", mse_dtree)
+print("MAE: ", mae_dtree)
+
+
+# ********************************************************************************** #
+# Grid of Dicision Tree
+cv_results = pd.DataFrame(gs_dtree.cv_results_)
+plt.figure(figsize=(10, 10))
+plt.title("Grid of Dicision Tree")
+# mittlere Scores der Validierung
+scores_dtree = np.array(cv_results.mean_test_score).reshape(10, 20)
+# scores_dtree = np.array(results.mean_test_score).reshape(5, 10)
+scores_image = mglearn.tools.heatmap(
+    scores_dtree,
+    ylabel="max_depth",
+    yticklabels=param_grid_dtree["max_depth"],
+    xlabel="min_samples_leaf",
+    xticklabels=param_grid_dtree["min_samples_leaf"],
+    cmap="viridis",
+)
+
+# visualize the Dicision Tree
+de = gs_dtree.best_params_['max_depth']
+le = gs_dtree.best_params_['min_samples_leaf']
+plt.figure(figsize=(20, 12))
+plt.suptitle("GridSearchCV, max_depth: {}, min_samples_leaf: {}".format(de, le), fontsize=16)
+tree.plot_tree(dtree, filled=True, fontsize=14)
+plt.show()
+# ********************************************************************************** #
 
 
 # Multi-Layer-Perceptron
+print("Star training Multi-Layer-Perceptron...")
 mlp = MLPRegressor()
 # specify the parameters to be searched as a dictionary
 param_grid_mlp = {
@@ -89,12 +124,15 @@ pred_mlp = mlp.predict  # <--- for the function picking!
 mse_mlp = mean_squared_error(y_test, pred_mlp(X_test))
 mae_mlp = mean_absolute_error(y_test, pred_mlp(X_test))
 r2_mlp = r2_score(y_test, pred_mlp(X_test))
+print("MSE: ", mse_mlp)
+print("MAE: ", mae_mlp)
 
-print(100 * "=")
+
+print(80 * "=")
 print(
-    "Initiation der Daten und Methode nimmt {:.2f} Sekunde.".format((time() - start))
+    "Initiation of models has taken {:.2f} seconds.".format((time() - start))
 )
-print(100 * "=")
+print(80 * "=")
 
 
 # *********************************** select the suitable prognosis model ******************************************** #
@@ -127,10 +165,10 @@ def select_func():
     # method = None
     # name = ''    # initial local variable 'name'
     # manual selection
-    my_num = input("Waehlen Sie ein Prognosemodell aus: ")  # <--- input here!
+    my_num = input("Select a prediction model: ")  # <--- input here!
     if len(my_num) == 0:
         name = name_auto
-        print("Keine Eingabe, das Modell bleibt beim Standard: {}".format(name))
+        print("No input, the model stays by default: {}".format(name))
         method = method_auto
     else:
         # generate a list of index
@@ -139,7 +177,7 @@ def select_func():
         idx = min(idx_list, key=lambda x: abs(x - float(my_num)))
         method = df_inf.loc[idx, "Funktion"]
         name = df_inf.loc[idx, "Name"]
-        print("Gewaehlt wird: {}".format(name))
+        print("Chosen: {}".format(name))
     return method, name
 
 
@@ -152,21 +190,21 @@ name_list = df_inf.loc[:, "Name"].tolist()
 method_num = len(df_display)
 
 print(
-    "Da stehen {0} Prognosemodelle zur Verfuegung:\n"
+    "There are {0} prediction models available:\n"
     "[1] Lineare Regression ({1[0]})\n"
     "[2] Decision Tree ({1[1]})\n"
     "[3] Multi-Layer-Perceptron ({1[2]})".format(method_num, name_list)
 )
-print("mit den Verallgemeinerungsgenauigkeiten: \n", df_display)
+print("with the generalization accuracies: \n", df_display)
 print(50 * "=")
 
 # pick the function
 pred_method, method_name = select_func()
 
 # show the parameter setting of the estimator
-print("Konfiguration der zur Parametersuche verwendeten Prognosemodell:")
+print("Configuration of the prediction model:")
 print(pred_method)
-print(100 * "=")
+print(80 * "=")
 
 
 if __name__ == "__main__":
