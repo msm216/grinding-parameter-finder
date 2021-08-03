@@ -27,7 +27,7 @@ kfold = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
 # Linear Regression
-print("Star training Linear Regression...")
+print("Start training Linear Regression...")
 lreg = linear_model.LinearRegression()
 # specify the parameters to be searched as a dictionary
 param_grid_lreg = {
@@ -47,12 +47,15 @@ pred_lreg = lreg.predict  # <--- for the function picking!
 mse_lreg = mean_squared_error(y_test, pred_lreg(X_test))
 mae_lreg = mean_absolute_error(y_test, pred_lreg(X_test))
 r2_lreg = r2_score(y_test, pred_lreg(X_test))
+print("Best training score: {:.2f}".format(gs_lreg.best_score_))
+print("Score on test data: {:.2f}".format(score_lreg))
 print("MSE: ", mse_lreg)
 print("MAE: ", mae_lreg)
 
+print(50 * "=")
 
 # Decision Tree
-print("Star training Decision Tree...")
+print("Start training Decision Tree...")
 dtree = tree.DecisionTreeRegressor()
 # specify the parameters to be searched as a dictionary
 depth_list = np.arange(1, 11, 1).tolist()
@@ -69,46 +72,23 @@ pred_dtree = dtree.predict  # <--- for the function picking!
 mse_dtree = mean_squared_error(y_test, pred_dtree(X_test))
 mae_dtree = mean_absolute_error(y_test, pred_dtree(X_test))
 r2_dtree = r2_score(y_test, pred_dtree(X_test))
+print("Best hyperparameter: {}".format(gs_dtree.best_params_))
+print("Best training score: {:.2f}".format(gs_dtree.best_score_))
+print("Score on test data: {:.2f}".format(score_dtree))
 print("MSE: ", mse_dtree)
 print("MAE: ", mae_dtree)
 
-
-# ********************************************************************************** #
-# Grid of Dicision Tree
-cv_results = pd.DataFrame(gs_dtree.cv_results_)
-plt.figure(figsize=(10, 10))
-plt.title("Grid of Dicision Tree")
-# mittlere Scores der Validierung
-scores_dtree = np.array(cv_results.mean_test_score).reshape(10, 20)
-# scores_dtree = np.array(results.mean_test_score).reshape(5, 10)
-scores_image = mglearn.tools.heatmap(
-    scores_dtree,
-    ylabel="max_depth",
-    yticklabels=param_grid_dtree["max_depth"],
-    xlabel="min_samples_leaf",
-    xticklabels=param_grid_dtree["min_samples_leaf"],
-    cmap="viridis",
-)
-
-# visualize the Dicision Tree
-de = gs_dtree.best_params_['max_depth']
-le = gs_dtree.best_params_['min_samples_leaf']
-plt.figure(figsize=(20, 12))
-plt.suptitle("GridSearchCV, max_depth: {}, min_samples_leaf: {}".format(de, le), fontsize=16)
-tree.plot_tree(dtree, filled=True, fontsize=14)
-plt.show()
-# ********************************************************************************** #
-
+print(50 * "=")
 
 # Multi-Layer-Perceptron
-print("Star training Multi-Layer-Perceptron...")
+print("Start training Multi-Layer-Perceptron...")
 mlp = MLPRegressor()
 # specify the parameters to be searched as a dictionary
 param_grid_mlp = {
     "activation": ["relu"],
     "solver": ["lbfgs"],
     "alpha": [0.1, 0.001, 0.0001],
-    "hidden_layer_sizes": [(19, 16), (5, 2)],
+    "hidden_layer_sizes": [(16,),(12,),(8,),(6,),(2,),(16, 8),(12, 4),(8, 2)],
     "max_iter": [1000],
     "random_state": [0],
     "tol": [1e-07, 1e-06, 1e-05, 1e-04],
@@ -124,6 +104,9 @@ pred_mlp = mlp.predict  # <--- for the function picking!
 mse_mlp = mean_squared_error(y_test, pred_mlp(X_test))
 mae_mlp = mean_absolute_error(y_test, pred_mlp(X_test))
 r2_mlp = r2_score(y_test, pred_mlp(X_test))
+print("Best hyperparameter: {}".format(gs_mlp.best_params_))
+print("Best training score: {:.2f}".format(gs_mlp.best_score_))
+print("Score on test data: {:.2f}".format(score_mlp))
 print("MSE: ", mse_mlp)
 print("MAE: ", mae_mlp)
 
@@ -208,11 +191,39 @@ print(80 * "=")
 
 
 if __name__ == "__main__":
+
+    if method_name == 'dtree':
+        # visualize the grid
+        cv_results = pd.DataFrame(gs_dtree.cv_results_)
+        plt.figure(figsize=(10, 10))
+        plt.title("Grid of Dicision Tree")
+        # mittlere Scores der Validierung
+        scores_dtree = np.array(cv_results.mean_test_score).reshape(10, 20)
+        # scores_dtree = np.array(results.mean_test_score).reshape(5, 10)
+        scores_image = mglearn.tools.heatmap(
+            scores_dtree,
+            ylabel="max_depth",
+            yticklabels=param_grid_dtree["max_depth"],
+            xlabel="min_samples_leaf",
+            xticklabels=param_grid_dtree["min_samples_leaf"],
+            cmap="viridis",
+        )
+
+        # visualize the Dicision Tree
+        de = gs_dtree.best_params_['max_depth']
+        le = gs_dtree.best_params_['min_samples_leaf']
+        plt.figure(figsize=(15, 10))
+        plt.title("GridSearchCV, max_depth: {}, min_samples_leaf: {}".format(de, le), fontsize=16)
+        tree.plot_tree(dtree, filled=True, fontsize=14)
+        plt.show()
+
+
     # x-axis
     r = len(X_test) + 1
     # y-axis
     y_pred = pred_method(X_test)
     # plot the prediction result
+    plt.title("Evaluation")
     plt.plot(np.arange(1, r), y_pred, "go-", label="predict")
     plt.plot(np.arange(1, r), y_test, "co-", label="real")
     plt.legend()

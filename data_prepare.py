@@ -92,7 +92,7 @@ def read_from_mysql():
 
 def read_local_excel():
     # path
-    file= os.getcwd()+'\\data.xlsx'
+    file= os.getcwd()+'\\data.xls'
     # 初始化空DataFrame
     df = pd.DataFrame()
     
@@ -173,7 +173,7 @@ data_full['Abtrag'] = differences.max(axis=1)
 data_full['StdAbw'] = differences.std(axis=1)
 # add columns of measurement quality
 #data_full['P'] = data_full.apply(lambda x: 1 if x.Abtrag >= 0 else 0, axis=1)
-data_full['Qualität'] = np.where(data_full['Abtrag'] >= 0.01, 1, 0)
+data_full['Qualität'] = np.where(data_full['Abtrag'] >= 0, 1, 0)
 
 # the original data set has 272 rows, 4 of them have missing values, 3 of them have exceptional high "Abtrag"
 
@@ -187,8 +187,27 @@ data = data_full[
 ].reset_index(drop=True)
 
 
-print("\nFeatures selected.")
+print("\nFeatures selected.\n")
 #print(data.sample(5))
+
+
+# amount of good measurement based on other attributes:
+fig, ax = plt.subplots(2, 2, figsize=(9, 8))  # 2 x 2 subplot grid
+plt.subplots_adjust(wspace=0.4, hspace=0.3)
+plt.suptitle("Verteilung der guten Messungen")
+sns.countplot("Drehzahl", hue="Qualität", data=data, ax=ax[0, 0])
+ax[0, 0].set_title("Messqualität beim Drehzahl")
+ax[0, 0].set_ylim([0, 100])
+sns.countplot("Vorschub", hue="Qualität", data=data, ax=ax[0, 1])
+ax[0, 1].set_title("Messqualität beim Vorschub")
+ax[0, 1].set_ylim([0, 100])
+sns.countplot("Kraft", hue="Qualität", data=data, ax=ax[1, 0])
+ax[1, 0].set_title("Messqualität beim Kraft")
+ax[1, 0].set_ylim([0, 100])
+sns.countplot("Winkel", hue="Qualität", data=data, ax=ax[1, 1])
+ax[1, 1].set_title("Messqualität beim Winkel")
+ax[1, 1].set_ylim([0, 100])
+plt.show()
 
 
 # choose the data with effective "Abtrag"
@@ -245,7 +264,7 @@ Feature = np.array(feature_df)
 Labels = np.ravel(label_df)
 
 
-print("Loaded data after filtering hast {} rows.\n".format(Feature.shape[0]))
+print("Loaded data after filtering has {} rows.\n".format(Feature.shape[0]))
 
 
 # split the train/test data set
