@@ -1,17 +1,12 @@
+# -*- coding: utf-8 -*-
 import pymysql
 import pandas as pd
 import numpy as np
 
 
-
-
 ### 全部写入测试 ###
 ### 共268行原始数据 ###
 
-
-# -*- coding: utf-8 -*-
-import pymysql
-import pandas as pd
 
 
 

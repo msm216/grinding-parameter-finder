@@ -1,30 +1,26 @@
 import pandas as pd
 import numpy as np
-import mglearn
+import matplotlib.pyplot as plt
 
 from time import time
 
 from sklearn import linear_model
 from sklearn import tree
 from sklearn.neural_network import MLPRegressor
-
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import matplotlib.pyplot as plt
 
 from data_prepare import X_train, X_test, y_train, y_test
 
 
 # ************************************** initialize the prognosis methods ******************************************** #
 
-
 # start = timeit.default_timer()
 start = time()
 
 # K-Folds cross-validator
 kfold = KFold(n_splits=5, shuffle=True, random_state=0)
-
 
 # Linear Regression
 print("Start training Linear Regression...")
@@ -191,32 +187,6 @@ print(80 * "=")
 
 
 if __name__ == "__main__":
-
-    if method_name == 'dtree':
-        # visualize the grid
-        cv_results = pd.DataFrame(gs_dtree.cv_results_)
-        plt.figure(figsize=(10, 10))
-        plt.title("Grid of Dicision Tree")
-        # mittlere Scores der Validierung
-        scores_dtree = np.array(cv_results.mean_test_score).reshape(10, 20)
-        # scores_dtree = np.array(results.mean_test_score).reshape(5, 10)
-        scores_image = mglearn.tools.heatmap(
-            scores_dtree,
-            ylabel="max_depth",
-            yticklabels=param_grid_dtree["max_depth"],
-            xlabel="min_samples_leaf",
-            xticklabels=param_grid_dtree["min_samples_leaf"],
-            cmap="viridis",
-        )
-
-        # visualize the Dicision Tree
-        de = gs_dtree.best_params_['max_depth']
-        le = gs_dtree.best_params_['min_samples_leaf']
-        plt.figure(figsize=(15, 10))
-        plt.title("GridSearchCV, max_depth: {}, min_samples_leaf: {}".format(de, le), fontsize=16)
-        tree.plot_tree(dtree, filled=True, fontsize=14)
-        plt.show()
-
 
     # x-axis
     r = len(X_test) + 1
