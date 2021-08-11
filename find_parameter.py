@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import itertools
 
-
 from data_prepare import sql_contr
 from model_initialize import pred_method, method_name
 from data_prepare import scaler
@@ -78,7 +77,7 @@ def find_parameter(estimator, expectation, *parameter_lists):
     parameter = []
     estimation = float()
     for d, v, k, w in itertools.product(*parameter_lists):
-        #prediction = estimator(np.array([[d/10000, v/500, k/50, w/10]]))
+        #pred = estimator(np.array([[d/10000, v/500, k/50, w/10]]))
         pred = estimator(scaler.transform([[d, v, k, w]]))
         deviation = abs(pred - expectation)
         if deviation < dev_min:
@@ -87,8 +86,8 @@ def find_parameter(estimator, expectation, *parameter_lists):
             dev_min = deviation
     return parameter, estimation    # list
 
-print("Bitte geben Sie Materialabtrag in [mm] der Reihe nach.")
-print("Die Eingabe leer lassen und Enter druecken, um weiter zu gehen.")
+print("Please enter material removal between 0.001[mm] and 0.07[mm] in sequence.")
+print("Leave the input blank and press Enter to stop the input process.")
 
 # run the parameter-finder for multiple times, put the results into a list
 p_list = []
@@ -131,7 +130,7 @@ print(
 
 # ************************************************ work on bench ***************************************************** #
 
-print("Virtual measuring results:\n", new_measuring_results)
+print("\nVirtual measuring results:\n", new_measuring_results)
 
 if sql_contr == True:
     write_to_sql(new_measuring_results)
