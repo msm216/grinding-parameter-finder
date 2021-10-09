@@ -3,9 +3,8 @@ import pandas as pd
 import numpy as np
 import itertools
 
-from data_prepare import sql_contr
+from data_prepare import sql_contr, scaler
 from model_initialize import pred_method, method_name
-from data_prepare import scaler
 from fake_bench import new_measuring_results, write_to_sql
 
 

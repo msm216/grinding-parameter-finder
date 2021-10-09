@@ -240,6 +240,7 @@ data_load["Qualitaet"] = np.where(data_load["Abtrag"] > 0, 1, 0)
 # keep the needed columns only, reset the index
 data_sel = data_load[["Drehzahl", "Vorschub", "Kraft", "Winkel", "Abtrag"]]
 print("Feature selected.")
+
 # detect indexes of outliers overall [80, 246, 257]
 outlier_ind_oa = detect_outliers_sd(data_sel, ["Abtrag"])
 # detect indexes of outliers by features [54, 129, 212, 246, 248, 251, 257]
@@ -248,15 +249,15 @@ outlier_ind = outliers_by_feature(data_sel, "iqr")
 outlier_ind.extend(outlier_ind_oa)
 outlier_ind = list(set(outlier_ind))
 outlier_ind.sort()
-# show the outliers
-print("Outliers dropped.")
 # drop the outliers
 data_sel = data_sel.drop(outlier_ind, axis=0)
+print("{} outliers dropped.".format(len(outlier_ind)))
 # drop the negative data and reset index
 data = data_sel.drop(
     data_sel[data_sel["Abtrag"] <= 0].index, axis=0
 )  # .reset_index(drop=True)
-print("Negative data dropped.\n")
+print("{} negative data dropped.\n".format(len(data_sel)-len(data)))
+
 print("Data set is ready\n", data.head(5))
 print(80 * "=")
 

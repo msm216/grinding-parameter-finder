@@ -84,7 +84,7 @@ param_grid_mlp = {
     "activation": ["relu"],
     "solver": ["lbfgs"],
     "alpha": [0.1, 0.001, 0.0001],
-    "hidden_layer_sizes": [(16,),(12,),(8,),(6,),(2,),(16, 8),(12, 4),(8, 2)],
+    "hidden_layer_sizes": [(16,),(8,),(6,),(16, 8),(12, 4),(8, 2)],
     "max_iter": [1000],
     "random_state": [0],
     "tol": [1e-07, 1e-06, 1e-05, 1e-04],
